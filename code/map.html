@@ -1,0 +1,237 @@
+<!DOCTYPE html >
+<head>
+    <meta charset="utf-8">
+    <title>城市空氣監測系統</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 40%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+    </style>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js"></script>
+    <script type="text/javascript">
+        //<![CDATA[
+	 var date;
+	 var time;
+           var show="temp";
+	 var timer;       
+	   
+	 function loadeveryminute(){
+           var Today=new Date();
+           var date= Today.getFullYear()+ "-"+ (Today.getMonth()+1) +"-"+ Today.getDate();
+           var time= Today.getHours()+":"+(Today.getMinutes())+":"+(Today.getSeconds());
+           show=form1.show.value;
+           form1.date.value=date;
+           form1.time.value=time;
+           draw(date,time,show);
+	clearInterval(timer);
+	timer= setInterval(loadeveryminute, 60000);
+        }
+		
+	function load(){
+		clearInterval(timer);
+		date=form1.date.value;
+		 time=form1.time.value;
+		show=form1.show.value;
+		draw(date,time,show);  
+	}
+	
+	function draw(date,time,show){
+            var map = new google.maps.Map(document.getElementById('map-canvas'), {
+                center: new google.maps.LatLng(25.02, 121.54),
+                zoom: 15,
+                mapTypeId: 'roadmap'
+            });
+            var infoWindow = new google.maps.InfoWindow;
+            // Change this depending on the name of your PHP file
+            downloadUrl("sqlxml.php?date="+date+"&time="+time, function(data) {
+                var xml = data.responseXML;
+                var markers = xml.documentElement.getElementsByTagName("marker");
+
+	    if(show=="temp"){
+                for (var i = 0; i < markers.length; i++) {
+                    var temp = markers[i].getAttribute("temp");
+                    var point = new google.maps.LatLng(
+                            parseFloat(markers[i].getAttribute("lat")),
+                            parseFloat(markers[i].getAttribute("lng")));
+                    var html = "<b>" + temp + "</b> <br/>";
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                           path: google.maps.SymbolPath.CIRCLE,
+                           strokeWeight: 0,
+                           fillColor: 'hsl('+((1-((Math.min(temp, 35) - 20)/(35 - 20)))*120)+', 100%, 50%)',
+                           fillOpacity: 0.4,
+                           scale:6                         
+                        }
+                    });
+
+                    bindInfoWindow(marker, map, infoWindow, html);
+                }
+            }
+            if(show=="humid"){
+                for (var i = 0; i < markers.length; i++) {
+                    var humid = markers[i].getAttribute("humid");
+                    var point = new google.maps.LatLng(
+                            parseFloat(markers[i].getAttribute("lat")),
+                            parseFloat(markers[i].getAttribute("lng")));
+                    var html = "<b>" + humid + "</b> <br/>";
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                           path: google.maps.SymbolPath.CIRCLE,
+                           strokeWeight: 0,
+                           fillColor: 'hsl('+((1-((Math.min(humid, 90) - 30)/(90 - 30)))*120)+', 100%, 50%)',
+                           fillOpacity: 0.4,
+                           scale:6
+                        }
+                    });
+
+                    bindInfoWindow(marker, map, infoWindow, html);
+                }
+            }
+            if(show=="mq5"){
+
+                for (var i = 0; i < markers.length; i++) {
+                    var mq5 = markers[i].getAttribute("mq5");
+                    var point = new google.maps.LatLng(
+                            parseFloat(markers[i].getAttribute("lat")),
+                            parseFloat(markers[i].getAttribute("lng")));
+                    var html = "<b>" + mq5 + "</b> <br/>";
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                           path: google.maps.SymbolPath.CIRCLE,
+                           strokeWeight: 0,
+                           fillColor: 'hsl('+((1-((Math.min(mq5, 100) - 10)/(100 - 10)))*120)+', 100%, 50%)',
+                           fillOpacity: 0.4,
+                           scale:6
+                        }
+                    });
+
+                    bindInfoWindow(marker, map, infoWindow, html);
+                }
+            }
+            if(show=="mq9"){
+
+                for (var i = 0; i < markers.length; i++) {
+                    var mq9 = markers[i].getAttribute("mq9");
+                    var point = new google.maps.LatLng(
+                            parseFloat(markers[i].getAttribute("lat")),
+                            parseFloat(markers[i].getAttribute("lng")));
+                    var html = "<b>" + mq9 + "</b> <br/>";
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                           path: google.maps.SymbolPath.CIRCLE,
+                           strokeWeight: 0,
+                           fillColor: 'hsl('+((1-((Math.min(mq9, 100) - 20)/(100 - 20)))*120)+', 100%, 50%)',
+                           fillOpacity: 0.4,
+                           scale:6
+                        }
+                    });
+
+                    bindInfoWindow(marker, map, infoWindow, html);
+                }
+            }
+            if(show=="dust"){
+
+                for (var i = 0; i < markers.length; i++) {
+                    var dust = markers[i].getAttribute("dust");
+                    var point = new google.maps.LatLng(
+                            parseFloat(markers[i].getAttribute("lat")),
+                            parseFloat(markers[i].getAttribute("lng")));
+                    var html = "<b>" + dust + "</b> <br/>";
+
+                    var marker = new google.maps.Marker({
+                        map: map,
+                        position: point,
+                        icon: {
+                           path: google.maps.SymbolPath.CIRCLE,
+                           strokeWeight: 0,
+                           fillColor: 'hsl('+((1-((Math.min(dust, 10) - 0)/(10 - 0)))*120)+', 100%, 50%)',
+                           fillOpacity: 0.4,
+                           scale:6
+                        }
+                    });
+
+                    bindInfoWindow(marker, map, infoWindow, html);
+                }
+            }
+            });
+        }
+
+        function bindInfoWindow(marker, map, infoWindow, html) {
+
+            google.maps.event.addListener(marker, 'click', function() {
+                infoWindow.setContent(html);
+                infoWindow.open(map, marker);
+            });
+        }
+
+        function downloadUrl(url, callback) {
+            var request = window.ActiveXObject ?
+                    new ActiveXObject('Microsoft.XMLHTTP') :
+                    new XMLHttpRequest;
+
+            request.onreadystatechange = function() {
+                if (request.readyState == 4) {
+                    request.onreadystatechange = doNothing;
+                    callback(request, request.status);
+                }
+            };
+
+            request.open('GET', url, true);
+            request.send(null);
+        }
+
+        function doNothing() {}
+
+        //]]>
+
+    </script>
+
+</head>
+<body onload="loadeveryminute()">
+<div id="panel">
+    <form name="form1" method="post" action="" >
+      <p>
+      項目
+	<select name="show" id="show">
+	　<option value="temp">Temperture</option>
+　        <option value="humid">Humidity</option>
+　        <option value="mq5">MQ5</option>
+　        <option value="mq9">MQ9</option>
+　        <option value="dust">Dust</option>
+        </select>
+      date
+      <input type="text" name="date" id="date">
+      time
+      <input type="text" name="time" id="time">
+      <input type="button" name="btn" id="btn" value="送出" onClick="load()">      
+      <input type="button" name="btn2" id="btn2" value="即時" onClick="loadeveryminute()"> 
+      </p>
+    </form>
+</div>
+<div id="map-canvas"></div>
+</body>
+</html>
